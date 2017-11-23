@@ -16,9 +16,9 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #ifdef _DEBUG
-#pragma comment(lib,"opencv_world310d.lib") 
+#pragma comment(lib,"opencv_world330d.lib") 
 #else
-#pragma comment(lib,"opencv_world310.lib") 
+#pragma comment(lib,"opencv_world330.lib") 
 #endif
 
 std::string GetInformation(vr::IVRSystem* pVRSystem, vr::ETrackedDeviceProperty eProp)
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
 				pVROverlay->HandleControllerOverlayInteractionAsMouse(hdlBigImage, uDeviceIdx);
 
 				// get information of controller
-				pVRSystem->GetControllerStateWithPose(vr::TrackingUniverseStanding, uDeviceIdx, &mCState, &mCPose);
+				pVRSystem->GetControllerStateWithPose(vr::TrackingUniverseStanding, uDeviceIdx, &mCState, sizeof(mCState), &mCPose);
 
 				std::ostringstream oss;
 				oss << uDeviceIdx << " (" << mCPose.eTrackingResult << ") - " << mCState.ulButtonPressed;

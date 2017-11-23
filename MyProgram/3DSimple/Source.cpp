@@ -20,10 +20,10 @@
 
 #pragma comment(lib,"glew32.lib") 
 #ifdef _DEBUG
-#pragma comment(lib,"opencv_world320d.lib") 
+#pragma comment(lib,"opencv_world330d.lib") 
 #pragma comment(lib,"freeglutd.lib") 
 #else
-#pragma comment(lib,"opencv_world320.lib") 
+#pragma comment(lib,"opencv_world330.lib") 
 #pragma comment(lib,"freeglut.lib") 
 #endif
 
