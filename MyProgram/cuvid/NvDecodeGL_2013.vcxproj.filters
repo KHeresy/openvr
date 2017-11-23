@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="helper\cudaModuleMgr.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="cudaProcessFrame.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameQueue.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageGL.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="NvDecodeGL.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenVRGL.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoDecoder.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoParser.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="VideoSource.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\dynlink_cuda.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="helper\dynlink_nvcuvid.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cudaProcessFrame.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameQueue.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageGL.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenVRGL.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoDecoder.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoParser.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="VideoSource.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header">
+      <UniqueIdentifier>{fad93ab9-5d61-404f-8f24-d6b8ac57a859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{8ef075da-ad37-410b-847f-5e1d0ca4d5b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kernel">
+      <UniqueIdentifier>{8ded15b7-cf9f-4d75-aa81-4e98839575a6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NV12ToARGB_drvapi_Win32.ptx">
+      <Filter>Kernel</Filter>
+    </None>
+  </ItemGroup>
+</Project>

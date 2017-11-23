@@ -105,15 +105,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>./;./helper;../../headers;D:\Heresy\OpenGL;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./helper;../../headers;D:\Heresy\OpenGL;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_MBCS;INIT_CUDA_GL=1;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>freeglutd.lib;glew32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Heresy\OpenGL\x86;../../lib/win32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cuda.lib;cudart.lib;cudadevrt.lib;glew32.lib;freeglutd.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Heresy\OpenGL\x86;$(CUDA_PATH)\lib\Win32;../../lib/win32</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <IgnoreSpecificDefaultLibraries>libcmtd.lib</IgnoreSpecificDefaultLibraries>
@@ -151,7 +151,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>./;./helper;../../headers;D:\Heresy\OpenGL;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;./helper;../../headers;D:\Heresy\OpenGL;$(CUDA_PATH)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_MBCS;INIT_CUDA_GL=1;NDEBUG;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
@@ -160,8 +160,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>freeglut.lib;glew32.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\Heresy\OpenGL\x86;../../lib/win32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cuda.lib;cudart.lib;cudadevrt.lib;glew32.lib;freeglut.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Heresy\OpenGL\x86;$(CUDA_PATH)\lib\Win32;../../lib/win32</AdditionalLibraryDirectories>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <IgnoreSpecificDefaultLibraries>libcmt</IgnoreSpecificDefaultLibraries>
@@ -211,9 +211,6 @@
     <ClCompile Include="VideoSource.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="data\plush1_720p_10s.m2v" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="cudaProcessFrame.h" />
     <ClInclude Include="FrameQueue.h" />
     <ClInclude Include="ImageGL.h" />
@@ -221,6 +218,9 @@
     <ClInclude Include="VideoDecoder.h" />
     <ClInclude Include="VideoParser.h" />
     <ClInclude Include="VideoSource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NV12ToARGB_drvapi_Win32.ptx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

@@ -1,33 +1,10 @@
-/*
- * Copyright 1993-2017 NVIDIA Corporation.  All rights reserved.
- *
- * Please refer to the NVIDIA end user license agreement (EULA) associated
- * with this source code for terms and conditions that govern your use of
- * this software. Any use, reproduction, disclosure, or distribution of
- * this software and related documentation outside the terms of the EULA
- * is strictly prohibited.
- *
- */
-
-/* This example demonstrates how to use the Video Decode Library with CUDA
- * bindings to interop between NVDECODE(using CUDA surfaces) and OpenGL (PBOs).
- * Post-Processing video (de-interlacing) is supported with this sample.
- */
-
 // OpenGL Graphics includes
 #include <GL/glew.h>
-#if defined(__APPLE__) || defined(__MACOSX)
-#include <GLUT/glut.h>
-#else
 #include <GL/freeglut.h>
-#endif
-
-#include "OpenVRGL.h"
-COpenVRGL*	g_pOpenVRGL = nullptr;
 
 // CUDA Header includes
-#include "dynlink_nvcuvid.h" // <nvcuvid.h>
-#include "dynlink_cuda.h"    // <cuda.h>
+#include <dynlink_nvcuvid.h> // <nvcuvid.h>
+#include <dynlink_cuda.h>    // <cuda.h>
 #include "dynlink_cudaGL.h"  // <cudaGL.h>
 #include "dynlink_builtin_types.h"
 
@@ -35,10 +12,13 @@ COpenVRGL*	g_pOpenVRGL = nullptr;
 #include "helper_functions.h"
 #include "helper_cuda_drvapi.h"
 
+#include "OpenVRGL.h"
+COpenVRGL*	g_pOpenVRGL = nullptr;
+
 // Includes
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <math.h>
 #include <memory>
 #include <iostream>
@@ -64,12 +44,6 @@ const char *sAppFilename = "NVDecodeGL";
 const char *sSDKname     = "NVDecodeGL";
 
 #define VIDEO_SOURCE_FILE "plush1_720p_10s.m2v"
-
-#ifdef _DEBUG
-#define ENABLE_DEBUG_OUT    0
-#else
-#define ENABLE_DEBUG_OUT    0
-#endif
 
 StopWatchInterface *frame_timer  = NULL;
 StopWatchInterface *global_timer = NULL;
@@ -1481,12 +1455,6 @@ bool copyDecodedFrameToTexture(unsigned int &nRepeats, int bUseInterop, int *pbI
                     checkCudaErrors(result);
                 }
             }
-
-#if ENABLE_DEBUG_OUT
-            printf("%s = %02d, PicIndex = %02d, OutputPTS = %08d\n",
-                   (oDisplayInfo.progressive_frame ? "Frame" : "Field"),
-                   g_DecodeFrameCount, oDisplayInfo.picture_index, oDisplayInfo.timestamp);
-#endif
 
             if (g_pImageGL)
             {
