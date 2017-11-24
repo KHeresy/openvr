@@ -35,7 +35,7 @@ void QtOpenVR::initializeGL()
 		m_Logger->enableMessages();
 	}
 
-	glClearColor(0.4, 0.4, 0, 4);
+	glClearColor(0.4, 0.4, 0.4, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
@@ -68,11 +68,13 @@ void QtOpenVR::paintGL()
 			
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-			glMultMatrixf((m_matHMDPose * rEyeData.m_matPose).constData());
+			glMultMatrixf((rEyeData.m_matPose*m_matHMDPose).constData());
 
 			//renderEye(rEyeData.m_eIndex);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_TEXTURE_2D);
 
 			glBegin(GL_TRIANGLES);
 			glColor3f(1.0, 0.0, 0.0);
@@ -91,15 +93,27 @@ void QtOpenVR::paintGL()
 		submitBuffer();
 	}
 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glViewport(0, 0, width(), height());
-	glDisable(GL_MULTISAMPLE);
-	//glEnable(GL_TEXTURE_2D);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	//glDisable(GL_MULTISAMPLE);
+	
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, m_aEyeDaya[0].m_pFrameBuffer->texture());
+
+	glColor3f(1.0, 1.0, 1.0);
 	glBegin(GL_QUADS);
-	//glColor3f(0.0, 0.0, 1.0);
-	glVertex3f(0, -0.5, -0.5);
-	glVertex3f(0, 0.5, -0.5);
-	glVertex3f(0, 0.5, 0.5);
-	glVertex3f(0, 0.5, 0.5);
+	glTexCoord2f(0,0);
+	glVertex3f(-1, -1, 0);
+	glTexCoord2f(1, 0);
+	glVertex3f(1, -1, 0);
+	glTexCoord2f(1, 1);
+	glVertex3f(1, 1, 0);
+	glTexCoord2f(0, 1);
+	glVertex3f(-1, 1,0);
 	glEnd();
 
 	update();
