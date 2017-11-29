@@ -7,6 +7,8 @@ QtOpenVR::QtOpenVR(QWidget *parent) : QOpenGLWidget(parent)
 	m_pVRSystem			= nullptr;
 	m_pResolveBuffer	= nullptr;
 
+	m_aClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 	m_fNearDistance = 0.1f;
 	m_fFarDistance = 5.0f;
 
@@ -35,12 +37,25 @@ void QtOpenVR::initializeGL()
 		m_Logger->enableMessages();
 	}
 
-	glClearColor(0.4, 0.4, 0.4, 1.0);
+	glClearColor(m_aClearColor[0], m_aClearColor[1], m_aClearColor[2], m_aClearColor[3]);
 	glEnable(GL_DEPTH_TEST);
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
 
 	initializeVR();
+}
+
+void QtOpenVR::releaseGL()
+{
+	makeCurrent();
+
+	releaseVR();
+
+	m_Logger->stopLogging();
+	delete m_Logger;
+	m_Logger = nullptr;
+
+	doneCurrent();
 }
 
 void QtOpenVR::resizeGL(int w, int h)
@@ -102,6 +117,7 @@ void QtOpenVR::paintGL()
 	//glDisable(GL_MULTISAMPLE);
 	
 	glEnable(GL_TEXTURE_2D);
+	glColor3f(1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, m_aEyeDaya[0].m_pFrameBuffer->texture());
 
 	glColor3f(1.0, 1.0, 1.0);
@@ -159,6 +175,21 @@ bool QtOpenVR::initializeVR()
 	}
 
 	return true;
+}
+
+void QtOpenVR::releaseVR()
+{
+	if (m_pVRSystem)
+	{
+		vr::VR_Shutdown();
+		m_pVRSystem = nullptr;
+
+		for (auto& rEyeData : m_aEyeDaya)
+			rEyeData.release();
+
+		delete m_pResolveBuffer;
+		m_pResolveBuffer = nullptr;
+	}
 }
 
 void QtOpenVR::updatePose()

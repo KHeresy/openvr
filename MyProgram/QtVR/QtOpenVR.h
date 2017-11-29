@@ -12,7 +12,7 @@
 #include <QOpenGLWidget>
 #include <QMatrix4x4>
 #include <QOpenGLFramebufferObject>
-
+#include <QOpenGLBuffer>
 #include <QOpenGLDebugLogger>
 
 class QtOpenVR : public QOpenGLWidget, public QOpenGLFunctions_4_1_Core
@@ -25,11 +25,13 @@ public:
 
 protected:
 	void initializeGL();
+	void releaseGL();
 	void resizeGL(int w, int h);
 	void paintGL();
 
 protected:
 	bool initializeVR();
+	void releaseVR();
 	void updatePose();
 	void submitBuffer();
 
@@ -85,16 +87,19 @@ protected:
 
 protected:
 	vr::IVRSystem*				m_pVRSystem;
-	QMatrix4x4					m_matHMDPose;
+
+	vr::TrackedDevicePose_t		m_aOvrDevicePose[vr::k_unMaxTrackedDeviceCount];
+	std::array<uint32_t, 2>		m_aOvrFrameSize;
 	QMatrix4x4					m_aDevicePose[vr::k_unMaxTrackedDeviceCount];
+	QMatrix4x4					m_matHMDPose;
+
 	std::array<CEyeData, 2>		m_aEyeDaya;
 	QOpenGLFramebufferObject*	m_pResolveBuffer;
 
-	std::array<uint32_t, 2>		m_aOvrFrameSize;
-	vr::TrackedDevicePose_t		m_aOvrDevicePose[vr::k_unMaxTrackedDeviceCount];
-
 	QOpenGLDebugLogger		*m_Logger;
 
+public:
+	std::array<float,4> m_aClearColor;
 	float	m_fNearDistance;
 	float	m_fFarDistance;
 };
