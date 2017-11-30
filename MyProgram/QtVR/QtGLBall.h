@@ -23,6 +23,7 @@ protected:
 	QOpenGLFunctions_4_1_Core	*m_pGLFunc;
 	QOpenGLShaderProgram		m_glShaderProgram;
 	QOpenGLBuffer				m_glVertexBuffer;
+	QOpenGLBuffer				m_glIndexBuffer;
 	QOpenGLVertexArrayObject	m_glVAO;
 	QOpenGLTexture				*m_pTexture;
 };

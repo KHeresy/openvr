@@ -3,7 +3,7 @@
 #include <QMatrix4x4>
 
 QtGLBall::QtGLBall(QObject *parent)
-	: QObject(parent)
+	: QObject(parent), m_glVertexBuffer(QOpenGLBuffer::VertexBuffer), m_glIndexBuffer(QOpenGLBuffer::IndexBuffer)
 {
 	m_pGLFunc = nullptr;
 	m_pTexture = nullptr;
@@ -43,11 +43,24 @@ bool QtGLBall::initializeGL(QOpenGLContext * pContext)
 
 		// Data of Vertext buffer
 		QVector<GLfloat> vPoints = {
-			0, -0.5, -0.5, 0, 0,
-			0, 0.5, -0.5, 0, 1,
-			0, 0.0, 0.5, 1, 0
+			-1, 0, -1,	0, 0,
+			1, 0, -1,	1, 0,
+			1, 0, 1,	1, 1,
+			-1, 0, 1,	0, 1
 		};
 		m_glVertexBuffer.allocate(vPoints.data(), vPoints.length() * sizeof(GLfloat));
+
+		// Index Array
+		m_glIndexBuffer.create();
+		m_glIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
+		m_glIndexBuffer.bind();
+
+		// Data of Index Buffer
+		QVector<GLuint> vIndex = {
+			0, 1, 2,
+			0, 2, 3
+		};
+		m_glIndexBuffer.allocate(vIndex.data(), vIndex.length() * sizeof(GLuint));
 
 		// bind shader
 		m_glShaderProgram.bind();
@@ -84,7 +97,7 @@ void QtGLBall::render(const QMatrix4x4 & matProjection, const QMatrix4x4 & matMo
 	m_glShaderProgram.setUniformValue("transform", matProjection * matModelView);
 	m_glShaderProgram.setUniformValue("leftEye", false);
 	m_glShaderProgram.setUniformValue("overUnder", false);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	
 	m_pTexture->release();
 	auto x = m_pTexture->textureId();
