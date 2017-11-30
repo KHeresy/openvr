@@ -15,6 +15,8 @@
 #include <QOpenGLBuffer>
 #include <QOpenGLDebugLogger>
 
+#include "QtGLBall.h"
+
 class QtOpenVR : public QOpenGLWidget, public QOpenGLFunctions_4_1_Core
 {
 	Q_OBJECT
@@ -97,6 +99,8 @@ protected:
 	QOpenGLFramebufferObject*	m_pResolveBuffer;
 
 	QOpenGLDebugLogger		*m_Logger;
+
+	QtGLBall				m_glBall;
 
 public:
 	std::array<float,4> m_aClearColor;

@@ -2,7 +2,7 @@
 
 #include <QMessageBox>
 
-QtOpenVR::QtOpenVR(QWidget *parent) : QOpenGLWidget(parent)
+QtOpenVR::QtOpenVR(QWidget *parent): m_glBall(this)
 {
 	m_pVRSystem			= nullptr;
 	m_pResolveBuffer	= nullptr;
@@ -24,6 +24,7 @@ void QtOpenVR::initializeGL()
 {
 	initializeOpenGLFunctions();
 
+	#pragma region Qt OpenGL Logger
 	m_Logger = new QOpenGLDebugLogger(this);
 	connect(m_Logger, &QOpenGLDebugLogger::messageLogged, [](QOpenGLDebugMessage message) {
 		auto s = message.message();
@@ -36,6 +37,9 @@ void QtOpenVR::initializeGL()
 		m_Logger->startLogging(QOpenGLDebugLogger::SynchronousLogging);
 		m_Logger->enableMessages();
 	}
+	#pragma endregion
+
+	m_glBall.initializeGL(QOpenGLWidget::context());
 
 	glClearColor(m_aClearColor[0], m_aClearColor[1], m_aClearColor[2], m_aClearColor[3]);
 	glEnable(GL_DEPTH_TEST);
@@ -50,6 +54,7 @@ void QtOpenVR::releaseGL()
 	makeCurrent();
 
 	releaseVR();
+	m_glBall.releaseGL();
 
 	m_Logger->stopLogging();
 	delete m_Logger;
@@ -77,28 +82,7 @@ void QtOpenVR::paintGL()
 
 			rEyeData.m_pFrameBuffer->bind();
 
-			glMatrixMode(GL_PROJECTION);
-			glLoadIdentity();
-			glMultMatrixf(rEyeData.m_matProjection.constData());
-			
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			glMultMatrixf((rEyeData.m_matPose*m_matHMDPose).constData());
-
-			//renderEye(rEyeData.m_eIndex);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			glEnable(GL_DEPTH_TEST);
-			glDisable(GL_TEXTURE_2D);
-
-			glBegin(GL_TRIANGLES);
-			glColor3f(1.0, 0.0, 0.0);
-			glVertex3f(0,-0.5, -0.5);
-			glColor3f(0.0, 1.0, 0.0);
-			glVertex3f(0, 0.5, -0.5);
-			glColor3f(0.0, 0.0, 1.0);
-			glVertex3f(0, 0.0, 0.5);
-			glEnd();
+			m_glBall.render(rEyeData.m_matProjection, rEyeData.m_matPose*m_matHMDPose, 0);
 
 			rEyeData.m_pFrameBuffer->release();
 
@@ -140,18 +124,21 @@ bool QtOpenVR::initializeVR()
 	vr::EVRInitError error = vr::VRInitError_None;
 	m_pVRSystem = vr::VR_Init(&error, vr::VRApplication_Scene);
 
-	if (error != vr::VRInitError_None)
+	if (error == vr::VRInitError_None)
+	{
+		// get frame buffers for eyes
+		m_pVRSystem->GetRecommendedRenderTargetSize(&m_aOvrFrameSize[0], &m_aOvrFrameSize[1]);
+	}
+	else
 	{
 		m_pVRSystem = nullptr;
 
 		QString message = vr::VR_GetVRInitErrorAsEnglishDescription(error);
 		qCritical() << message;
 		QMessageBox::critical(this, "Unable to init VR", message);
-		return false;
+		
+		m_aOvrFrameSize = { 512,512 };
 	}
-
-	// setup frame buffers for eyes
-	m_pVRSystem->GetRecommendedRenderTargetSize(&m_aOvrFrameSize[0], &m_aOvrFrameSize[1]);
 
 	// get eye matrices
 	for (auto& rEyeData : m_aEyeDaya)
@@ -166,7 +153,7 @@ bool QtOpenVR::initializeVR()
 	m_pResolveBuffer = new QOpenGLFramebufferObject(m_aOvrFrameSize[0] * 2, m_aOvrFrameSize[1], resolveFormat);
 
 	// turn on compositor
-	if (!vr::VRCompositor())
+	if (m_pVRSystem == nullptr || !vr::VRCompositor())
 	{
 		QString message = "Compositor initialization failed. See log file for details";
 		qCritical() << message;
@@ -221,8 +208,11 @@ void QtOpenVR::submitBuffer()
 
 void QtOpenVR::CEyeData::initialize(QtOpenVR& rQVR)
 {
-	m_matProjection = toQMatrix4(rQVR.m_pVRSystem->GetProjectionMatrix(m_eIndex, rQVR.m_fNearDistance, rQVR.m_fFarDistance));
-	m_matPose = toQMatrix4(rQVR.m_pVRSystem->GetEyeToHeadTransform(m_eIndex)).inverted();
+	if (rQVR.m_pVRSystem != nullptr)
+	{
+		m_matProjection = toQMatrix4(rQVR.m_pVRSystem->GetProjectionMatrix(m_eIndex, rQVR.m_fNearDistance, rQVR.m_fFarDistance));
+		m_matPose = toQMatrix4(rQVR.m_pVRSystem->GetEyeToHeadTransform(m_eIndex)).inverted();
+	}
 
 	QOpenGLFramebufferObjectFormat buffFormat;
 	buffFormat.setAttachment(QOpenGLFramebufferObject::Depth);

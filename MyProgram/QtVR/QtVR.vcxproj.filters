@@ -54,6 +54,15 @@
     <ClCompile Include="QtOpenVR.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_QtGLBall.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_QtGLBall.cpp">
+      <Filter>Generated Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QtGLBall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="QtVR.h">
@@ -66,6 +75,9 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="QtOpenVR.h">
+      <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="QtGLBall.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
