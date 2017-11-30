@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="QtVR">
+    <qresource prefix="/QtVR">
+        <file>shader/unlit.frag</file>
+        <file>shader/unlit.vert</file>
     </qresource>
 </RCC>

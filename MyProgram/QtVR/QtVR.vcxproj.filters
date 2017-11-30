@@ -28,6 +28,9 @@
       <Extensions>moc;h;cpp</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Shader">
+      <UniqueIdentifier>{91840972-6dd3-4c8f-aa9e-f073d34766aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -85,5 +88,13 @@
     <ClInclude Include="GeneratedFiles\ui_QtVR.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\unlit.vert">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="shader\unlit.frag">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
 </Project>

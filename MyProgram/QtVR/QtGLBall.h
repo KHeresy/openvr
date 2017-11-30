@@ -2,6 +2,10 @@
 
 #include <QObject>
 #include <QOpenGLFunctions_4_1_Core>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLTexture>
+#include <QOpenGLBuffer>
 
 class QtGLBall : public QObject
 {
@@ -17,4 +21,8 @@ public:
 
 protected:
 	QOpenGLFunctions_4_1_Core	*m_pGLFunc;
+	QOpenGLShaderProgram		m_glShaderProgram;
+	QOpenGLBuffer				m_glVertexBuffer;
+	QOpenGLVertexArrayObject	m_glVAO;
+	QOpenGLTexture				*m_pTexture;
 };

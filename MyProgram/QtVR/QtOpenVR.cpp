@@ -82,6 +82,7 @@ void QtOpenVR::paintGL()
 
 			rEyeData.m_pFrameBuffer->bind();
 
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			m_glBall.render(rEyeData.m_matProjection, rEyeData.m_matPose*m_matHMDPose, 0);
 
 			rEyeData.m_pFrameBuffer->release();
@@ -93,6 +94,7 @@ void QtOpenVR::paintGL()
 	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	glViewport(0, 0, width(), height());
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -100,9 +102,11 @@ void QtOpenVR::paintGL()
 	glLoadIdentity();
 	//glDisable(GL_MULTISAMPLE);
 	
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_TEXTURE_2D);
 	glColor3f(1.0, 1.0, 1.0);
-	glBindTexture(GL_TEXTURE_2D, m_aEyeDaya[0].m_pFrameBuffer->texture());
+
+	glBindTexture(GL_TEXTURE_2D, m_pResolveBuffer->texture());
 
 	glColor3f(1.0, 1.0, 1.0);
 	glBegin(GL_QUADS);
