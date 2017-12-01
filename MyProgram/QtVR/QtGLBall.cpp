@@ -1,5 +1,6 @@
 #include "QtGLBall.h"
 
+#include <QtMath>
 #include <QMatrix4x4>
 
 QtGLBall::QtGLBall(QObject *parent)
@@ -7,11 +8,57 @@ QtGLBall::QtGLBall(QObject *parent)
 {
 	m_pGLFunc = nullptr;
 	m_pTexture = nullptr;
+
+	m_uRestartIndex = std::numeric_limits<unsigned int>::max();
+
+	m_matTransform1.setToIdentity();
+	m_matTransform2.setToIdentity();
 }
 
 QtGLBall::~QtGLBall()
 {
 	releaseGL();
+}
+
+void QtGLBall::buildBall(float fSize, unsigned int uNumW, unsigned int uNumH)
+{
+	m_vVertexPoints.clear();
+	m_vIndexPoints.clear();
+
+	unsigned int uSize = uNumW * uNumH;
+	m_vVertexPoints.reserve(uSize * 5);
+	float fXRatio = 360.0 / (uNumW - 1);
+	float fYRatio = 180.0 / (uNumH - 1);
+	float fX;
+	float fY;
+
+	for (int y = 0; y < uNumH; ++y )
+	{
+		for (int x = 0; x < uNumW; ++x )
+		{
+			int iIdx = y * uNumW + x;
+			fX = (-180.0 + x * fXRatio) * M_PI / 180.0;
+			fY = (-90.0 + y * fYRatio) * M_PI / 180.0;
+
+			m_vVertexPoints.push_back(fSize*cos(fY)*cos(fX));
+			m_vVertexPoints.push_back(fSize*cos(fY)*sin(fX));
+			m_vVertexPoints.push_back(fSize*sin(fY));
+			m_vVertexPoints.push_back(x / (uNumW - 1.0));
+			m_vVertexPoints.push_back(1.0 - (y / (uNumH - 1.0)));
+		}
+	}
+
+	for (int y = 0; y < uNumH; ++y)
+	{
+		for (int x = 0; x < uNumW; ++x)
+		{
+			m_vIndexPoints.push_back(y*uNumW + x);
+			m_vIndexPoints.push_back((y+1)*uNumW + x);
+		}
+		m_vIndexPoints.push_back(m_uRestartIndex);
+	}
+
+	m_matTransform2.translate(0, 1 + fSize / 2, 0);
 }
 
 bool QtGLBall::initializeGL(QOpenGLContext * pContext)
@@ -40,27 +87,13 @@ bool QtGLBall::initializeGL(QOpenGLContext * pContext)
 		m_glVertexBuffer.create();
 		m_glVertexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
 		m_glVertexBuffer.bind();
-
-		// Data of Vertext buffer
-		QVector<GLfloat> vPoints = {
-			-1, 0, -1,	0, 0,
-			1, 0, -1,	1, 0,
-			1, 0, 1,	1, 1,
-			-1, 0, 1,	0, 1
-		};
-		m_glVertexBuffer.allocate(vPoints.data(), vPoints.length() * sizeof(GLfloat));
+		m_glVertexBuffer.allocate(m_vVertexPoints.data(), m_vVertexPoints.length() * sizeof(GLfloat));
 
 		// Index Array
 		m_glIndexBuffer.create();
 		m_glIndexBuffer.setUsagePattern(QOpenGLBuffer::StaticDraw);
 		m_glIndexBuffer.bind();
-
-		// Data of Index Buffer
-		QVector<GLuint> vIndex = {
-			0, 1, 2,
-			0, 2, 3
-		};
-		m_glIndexBuffer.allocate(vIndex.data(), vIndex.length() * sizeof(GLuint));
+		m_glIndexBuffer.allocate(m_vIndexPoints.data(), m_vIndexPoints.length() * sizeof(GLuint));
 
 		// bind shader
 		m_glShaderProgram.bind();
@@ -87,20 +120,20 @@ void QtGLBall::releaseGL()
 
 void QtGLBall::render(const QMatrix4x4 & matProjection, const QMatrix4x4 & matModelView, int iIndex)
 {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_TEXTURE_2D);
+	m_pGLFunc->glEnable(GL_DEPTH_TEST);
+	m_pGLFunc->glEnable(GL_TEXTURE_2D);
 
 	m_glVAO.bind();
 	m_glShaderProgram.bind();
 	m_pTexture->bind();
 
-	m_glShaderProgram.setUniformValue("transform", matProjection * matModelView);
+	m_glShaderProgram.setUniformValue("transform", matProjection * matModelView * m_matTransform2 * m_matTransform1);
 	m_glShaderProgram.setUniformValue("leftEye", false);
 	m_glShaderProgram.setUniformValue("overUnder", false);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	m_pGLFunc->glPrimitiveRestartIndex(m_uRestartIndex);
+	m_pGLFunc->glDrawElements(GL_TRIANGLE_STRIP, m_vIndexPoints.size(), GL_UNSIGNED_INT, 0);
 	
 	m_pTexture->release();
-	auto x = m_pTexture->textureId();
 	m_glVAO.release();
 	m_glShaderProgram.release();
 	return;

@@ -14,6 +14,8 @@ QtOpenVR::QtOpenVR(QWidget *parent): m_glBall(this)
 
 	m_aEyeDaya[0].m_eIndex = vr::Eye_Left;
 	m_aEyeDaya[1].m_eIndex = vr::Eye_Right;
+
+	m_glBall.buildBall(1,50,50);
 }
 
 QtOpenVR::~QtOpenVR()
