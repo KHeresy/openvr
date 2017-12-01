@@ -10,12 +10,12 @@ QtOpenVR::QtOpenVR(QWidget *parent): m_glBall(this)
 	m_aClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
 	m_fNearDistance = 0.1f;
-	m_fFarDistance = 5.0f;
+	m_fFarDistance = 100.0f;
 
 	m_aEyeDaya[0].m_eIndex = vr::Eye_Left;
 	m_aEyeDaya[1].m_eIndex = vr::Eye_Right;
 
-	m_glBall.buildBall(1,50,50);
+	m_glBall.buildBall(10,50,50);
 }
 
 QtOpenVR::~QtOpenVR()

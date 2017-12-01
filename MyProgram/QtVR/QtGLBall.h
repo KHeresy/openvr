@@ -34,5 +34,4 @@ protected:
 
 	QVector<GLfloat>			m_vVertexPoints;
 	QVector<GLuint>				m_vIndexPoints;
-	unsigned int				m_uRestartIndex;
 };

@@ -9,8 +9,6 @@ QtGLBall::QtGLBall(QObject *parent)
 	m_pGLFunc = nullptr;
 	m_pTexture = nullptr;
 
-	m_uRestartIndex = std::numeric_limits<unsigned int>::max();
-
 	m_matTransform1.setToIdentity();
 	m_matTransform2.setToIdentity();
 }
@@ -32,6 +30,7 @@ void QtGLBall::buildBall(float fSize, unsigned int uNumW, unsigned int uNumH)
 	float fX;
 	float fY;
 
+	//TODO: have problem at op and bottom
 	for (int y = 0; y < uNumH; ++y )
 	{
 		for (int x = 0; x < uNumW; ++x )
@@ -55,9 +54,9 @@ void QtGLBall::buildBall(float fSize, unsigned int uNumW, unsigned int uNumH)
 			m_vIndexPoints.push_back(y*uNumW + x);
 			m_vIndexPoints.push_back((y+1)*uNumW + x);
 		}
-		m_vIndexPoints.push_back(m_uRestartIndex);
 	}
 
+	m_matTransform1.rotate(-90, 1, 0, 0);
 	m_matTransform2.translate(0, 1 + fSize / 2, 0);
 }
 
@@ -107,7 +106,7 @@ bool QtGLBall::initializeGL(QOpenGLContext * pContext)
 
 		m_glShaderProgram.setUniformValue("diffuse", 0);
 
-		m_pTexture = new QOpenGLTexture(QImage("C:\\Users\\Heresy\\Pictures\\viewer.jpg"));
+		m_pTexture = new QOpenGLTexture(QImage("C:\\Users\\Heresy\\Pictures\\test.jpg"));
 	}
 
 	return bOK;
@@ -130,7 +129,6 @@ void QtGLBall::render(const QMatrix4x4 & matProjection, const QMatrix4x4 & matMo
 	m_glShaderProgram.setUniformValue("transform", matProjection * matModelView * m_matTransform2 * m_matTransform1);
 	m_glShaderProgram.setUniformValue("leftEye", false);
 	m_glShaderProgram.setUniformValue("overUnder", false);
-	m_pGLFunc->glPrimitiveRestartIndex(m_uRestartIndex);
 	m_pGLFunc->glDrawElements(GL_TRIANGLE_STRIP, m_vIndexPoints.size(), GL_UNSIGNED_INT, 0);
 	
 	m_pTexture->release();
