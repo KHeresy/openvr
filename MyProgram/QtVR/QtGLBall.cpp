@@ -49,7 +49,7 @@ void QtGLBall::buildBall(float fSize, unsigned int uNumW, unsigned int uNumH)
 	}
 
 	m_uRestartIndex = m_vVertexPoints.size() + 1;
-	for (int y = 0; y < uNumH; ++y)
+	for (int y = 0; y < uNumH-1; ++y)
 	{
 		for (int x = 0; x < uNumW; ++x)
 		{
@@ -110,6 +110,7 @@ bool QtGLBall::initializeGL(QOpenGLContext * pContext)
 		m_glShaderProgram.setUniformValue("diffuse", 0);
 
 		m_pTexture = new QOpenGLTexture(QImage("C:\\Users\\Heresy\\Pictures\\test.jpg"));
+		m_pTexture->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
 	}
 
 	return bOK;
