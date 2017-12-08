@@ -132,7 +132,7 @@ protected:
 	class CController
 	{
 	public:
-		CController(vr::IVRSystem*	pVRSystem, vr::TrackedDeviceIndex_t	uIdx);
+		CController(vr::IVRSystem*	pVRSystem, vr::TrackedDeviceIndex_t	uIdx, glm::mat4& mMatrix );
 
 		// Process controller event
 		bool ProcessEvent(vr::ETrackingUniverseOrigin eOrigin);
@@ -150,6 +150,7 @@ protected:
 		vr::ETrackedControllerRole	m_eRole;
 		vr::TrackedDevicePose_t		m_Pose;
 		vr::VRControllerState_t		m_eState;
+		glm::mat4&					m_mMatrix;
 	};
 
 	// class for device model
@@ -246,8 +247,11 @@ public:
 	{
 		COpenVRGL* pThis = this;
 		auto funcExtDraw = [funcDraw, pThis](vr::Hmd_Eye eEye, glm::mat4 matModelView, glm::mat4 matProjection) {
-			funcDraw(eEye, matModelView, matProjection);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 			pThis->m_pDeviceModel->Draw(eEye, matModelView, matProjection, pThis->m_aTrackedDeviceMatrix);
+
+			funcDraw(eEye, matModelView, matProjection);
 		};
 
 		// draw left eye and right eye scene

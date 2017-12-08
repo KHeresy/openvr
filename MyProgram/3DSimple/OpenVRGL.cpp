@@ -211,7 +211,7 @@ void COpenVRGL::AddNewDevice(vr::TrackedDeviceIndex_t uIdx)
 	{
 		if (m_vController.find(uIdx) == m_vController.end())
 		{
-			m_vController.emplace(uIdx, CController(m_pVRSystem, uIdx));
+			m_vController.emplace(uIdx, CController(m_pVRSystem, uIdx, m_aTrackedDeviceMatrix[uIdx]));
 		}
 	}
 
@@ -563,7 +563,7 @@ void COpenVRGL::CDeviceModel::SetupRenderModelForTrackedDevice(vr::TrackedDevice
 #pragma endregion
 
 #pragma region Functions of COpenVRGL::CController
-COpenVRGL::CController::CController(vr::IVRSystem * pVRSystem, vr::TrackedDeviceIndex_t uIdx)
+COpenVRGL::CController::CController(vr::IVRSystem * pVRSystem, vr::TrackedDeviceIndex_t uIdx, glm::mat4& mMatrix) : m_mMatrix(mMatrix)
 {
 	m_pVRSystem = pVRSystem;
 	m_uIdx = uIdx;
