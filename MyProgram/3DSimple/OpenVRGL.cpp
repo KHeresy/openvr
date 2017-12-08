@@ -574,7 +574,7 @@ bool COpenVRGL::CController::ProcessEvent(vr::ETrackingUniverseOrigin eOrigin)
 {
 	if (m_pVRSystem->GetControllerStateWithPose(eOrigin, m_uIdx, &m_eState, sizeof(m_eState), &m_Pose))
 	{
-		if (m_eState.ulButtonTouched != 0)
+		if (m_eState.ulButtonPressed != 0)
 		{
 			if (m_eState.ulButtonPressed & vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu))
 			{
@@ -584,6 +584,9 @@ bool COpenVRGL::CController::ProcessEvent(vr::ETrackingUniverseOrigin eOrigin)
 			{
 				std::cout << "[Grip]";
 			}
+		}
+		if (m_eState.ulButtonTouched != 0)
+		{
 			if (m_eState.ulButtonTouched & vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger))
 			{
 				std::cout << "[Trigger:";
