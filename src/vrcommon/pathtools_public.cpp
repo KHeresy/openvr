@@ -97,6 +97,24 @@ bool Path_SetWorkingDirectory( const std::string & sPath )
 	return bSuccess;
 }
 
+/** Gets the path to a temporary directory. */
+std::string Path_GetTemporaryDirectory()
+{
+#if defined( _WIN32 )
+	wchar_t buf[MAX_UNICODE_PATH];
+	if ( GetTempPathW( MAX_UNICODE_PATH, buf ) == 0 )
+		return Path_GetWorkingDirectory();
+	return UTF16to8( buf );
+#else
+	const char *pchTmpDir = getenv( "TMPDIR" );
+	if ( pchTmpDir == NULL )
+	{
+		return "";
+	}
+	return pchTmpDir;
+#endif
+}
+
 /** Returns the specified path without its filename */
 std::string Path_StripFilename( const std::string & sPath, char slash )
 {
@@ -759,6 +777,7 @@ std::string Path_FilePathToUrl( const std::string & sRelativePath, const std::st
 		std::string sAbsolute = Path_MakeAbsolute( sRelativePath, sBasePath );
 		if ( sAbsolute.empty() )
 			return sAbsolute;
+		sAbsolute = Path_FixSlashes( sAbsolute, '/' );
 		return std::string( FILE_URL_PREFIX ) + sAbsolute;
 	}
 }
@@ -770,7 +789,9 @@ std::string Path_UrlToFilePath( const std::string & sFileUrl )
 {
 	if ( !strnicmp( sFileUrl.c_str(), FILE_URL_PREFIX, strlen( FILE_URL_PREFIX ) ) )
 	{
-		return sFileUrl.c_str() + strlen( FILE_URL_PREFIX );
+		std::string sRet = sFileUrl.c_str() + strlen( FILE_URL_PREFIX );
+		sRet = Path_FixSlashes( sRet );
+		return sRet;
 	}
 	else
 	{
@@ -817,3 +838,16 @@ std::string GetUserDocumentsPath()
 #endif
 }
 
+
+// -----------------------------------------------------------------------------------------------------
+// Purpose: deletes / unlinks a single file
+// -----------------------------------------------------------------------------------------------------
+bool Path_UnlinkFile( const std::string &strFilename )
+{
+#if defined( WIN32 )
+	std::wstring wsFilename = UTF8to16( strFilename.c_str() );
+	return ( 0 != DeleteFileW( wsFilename.c_str() ) );
+#else
+	return ( 0 == unlink( strFilename.c_str() ) );
+#endif
+}
