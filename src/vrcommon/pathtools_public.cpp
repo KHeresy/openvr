@@ -16,7 +16,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <alloca.h>
 #endif
+
 #if defined OSX
 #include <Foundation/Foundation.h>
 #include <AppKit/AppKit.h>
@@ -409,6 +411,20 @@ std::string Path_Compact( const std::string & sRawPath, char slash )
 }
 
 
+/** Returns true if these two paths are the same without respect for internal . or ..
+* sequences, slash type, or case (on case-insensitive platforms). */
+bool Path_IsSamePath( const std::string & sPath1, const std::string & sPath2 )
+{
+	std::string sCompact1 = Path_Compact( sPath1 );
+	std::string sCompact2 = Path_Compact( sPath2 );
+#if defined(WIN32)
+	return !stricmp( sCompact1.c_str(), sCompact2.c_str() );
+#else
+	return !strcmp( sCompact1.c_str(), sCompact2.c_str() );
+#endif
+}
+
+
 /** Returns the path to the current DLL or exe */
 std::string Path_GetThisModulePath()
 {
@@ -700,6 +716,28 @@ std::string Path_ReadTextFile( const std::string &strFilename )
 }
 
 
+bool Path_MakeWritable( const std::string &strFilename )
+{
+#if defined ( _WIN32 )
+	std::wstring wstrFilename = UTF8to16( strFilename.c_str() );
+
+	DWORD dwAttrs = GetFileAttributesW( wstrFilename.c_str() );
+	if ( dwAttrs != INVALID_FILE_ATTRIBUTES && ( dwAttrs & FILE_ATTRIBUTE_READONLY ) )
+	{
+		return SetFileAttributesW( wstrFilename.c_str(), dwAttrs & ~FILE_ATTRIBUTE_READONLY );
+	}
+#else
+	struct stat sb;
+
+	if ( stat( strFilename.c_str(), &sb ) == 0 && !( sb.st_mode & S_IWUSR ) )
+	{
+		return ( chmod( strFilename.c_str(), sb.st_mode | S_IWUSR ) == 0 );
+	}
+#endif
+
+	return true;
+}
+
 bool Path_WriteStringToTextFile( const std::string &strFilename, const char *pchData )
 {
 	FILE *f;
@@ -778,7 +816,12 @@ std::string Path_FilePathToUrl( const std::string & sRelativePath, const std::st
 		if ( sAbsolute.empty() )
 			return sAbsolute;
 		sAbsolute = Path_FixSlashes( sAbsolute, '/' );
-		return std::string( FILE_URL_PREFIX ) + sAbsolute;
+
+		size_t unBufferSize = sAbsolute.length() * 3;
+		char *pchBuffer = (char *)alloca( unBufferSize );
+		V_URLEncodeNoPlusForSpace( pchBuffer, (int)unBufferSize, sAbsolute.c_str(), (int)sAbsolute.length() );
+
+		return std::string( FILE_URL_PREFIX ) + pchBuffer;
 	}
 }
 
@@ -789,9 +832,11 @@ std::string Path_UrlToFilePath( const std::string & sFileUrl )
 {
 	if ( !strnicmp( sFileUrl.c_str(), FILE_URL_PREFIX, strlen( FILE_URL_PREFIX ) ) )
 	{
-		std::string sRet = sFileUrl.c_str() + strlen( FILE_URL_PREFIX );
-		sRet = Path_FixSlashes( sRet );
-		return sRet;
+		char *pchBuffer = (char *)alloca( sFileUrl.length() );
+		V_URLDecodeNoPlusForSpace( pchBuffer, (int)sFileUrl.length(), 
+			sFileUrl.c_str() + strlen( FILE_URL_PREFIX ), (int)( sFileUrl.length() - strlen( FILE_URL_PREFIX ) ) );
+
+		return Path_FixSlashes( pchBuffer );
 	}
 	else
 	{
