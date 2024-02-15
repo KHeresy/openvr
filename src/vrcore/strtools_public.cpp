@@ -79,18 +79,32 @@ bool StringHasSuffixCaseSensitive( const std::string &sString, const std::string
 	return 0 == strncmp( sStringSuffix.c_str(), sSuffix.c_str(),cSuffixLen );
 }
 
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-typedef std::codecvt_utf8< wchar_t > convert_type;
-
-std::string UTF16to8(const wchar_t * in)
+std::string StringReplace( const std::string &sModify, const std::string &sFind, const std::string &sReplace )
 {
-	static std::wstring_convert< convert_type, wchar_t > s_converter;  // construction of this can be expensive (or even serialized) depending on locale
+	size_t cStartPos = 0;
+	size_t cFindLen = sFind.length();
+	size_t cReplaceLen = sReplace.length();
+
+	std::string sResult = sModify;
+
+	while ( ( cStartPos = sResult.find( sFind, cStartPos ) ) != std::string::npos )
+	{
+		sResult.replace( cStartPos, cFindLen, sReplace );
+		cStartPos += cReplaceLen;
+	}
+	return sResult;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts a UTF-16 formatted string to a UTF-8 formatted string
+//-----------------------------------------------------------------------------
+std::string UTF16to8( const std::wstring &in )
+{
+	static std::wstring_convert< std::codecvt_utf8_utf16< wchar_t >, wchar_t > s_convert; // construction of this can be expensive (or even serialized) depending on locale
 
 	try
 	{
-		return s_converter.to_bytes( in );
+		return s_convert.to_bytes( in );
 	}
 	catch ( ... )
 	{
@@ -98,16 +112,27 @@ std::string UTF16to8(const wchar_t * in)
 	}
 }
 
-std::string UTF16to8( const std::wstring & in ) { return UTF16to8( in.c_str() ); }
-
-
-std::wstring UTF8to16(const char * in)
+std::string UTF16to8( const wchar_t * in )
 {
-	static std::wstring_convert< convert_type, wchar_t > s_converter;  // construction of this can be expensive (or even serialized) depending on locale
+	if (in == nullptr)
+	{
+		return std::string();
+	}
+
+	std::wstring wstr( in );
+	return UTF16to8( wstr );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Converts a UTF-8 formatted string to a UTF-16 formatted string
+//-----------------------------------------------------------------------------
+std::wstring UTF8to16( const std::string &in )
+{
+	static std::wstring_convert< std::codecvt_utf8_utf16< wchar_t >, wchar_t > s_convert; // construction of this can be expensive (or even serialized) depending on locale
 
 	try
 	{
-		return s_converter.from_bytes( in );
+		return s_convert.from_bytes( in );
 	}
 	catch ( ... )
 	{
@@ -115,7 +140,16 @@ std::wstring UTF8to16(const char * in)
 	}
 }
 
-std::wstring UTF8to16( const std::string & in ) { return UTF8to16( in.c_str() ); }
+std::wstring UTF8to16( const char * in )
+{
+	if ( in == nullptr )
+	{
+		return std::wstring();
+	}
+
+	std::string str( in );
+	return UTF8to16( str );
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Format string to std::string converter
